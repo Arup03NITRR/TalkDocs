@@ -53,7 +53,7 @@ TalkDocs is a powerful PDF assistant that allows you to upload **multiple PDF do
 | Text Splitting     | LangChain TextSplitter                 |
 | Embedding Model    | HuggingFace (MiniLM-L6-v2)             |
 | Vector Store       | FAISS                                  |
-| LLM Backend        | Groq LLaMA 3.3                         |
+| LLM Backend        | Groq LLaMA 3.8                         |
 | Memory             | LangChain ConversationBufferMemory     |
 
 ---
