@@ -20,6 +20,19 @@ TalkDocs is a powerful PDF assistant that allows you to upload **multiple PDF do
 
 ---
 
+<div align="center">
+
+🎉 **Try it now live** on Streamlit Cloud!  
+<br/>
+
+<a href="https://talkdocs-app.streamlit.app/" target="_blank">
+  <img src="https://img.shields.io/badge/Open-Live%20App-green?style=for-the-badge&logo=streamlit" alt="Live Demo">
+</a>
+
+</div>
+
+---
+
 ## ✨ Features
 
 - 💬 Chat interface powered by **LLaMA 3.3 via Groq**
