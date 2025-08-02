@@ -36,14 +36,19 @@ def get_pdf_text(pdf_docs):
 
     if unreadable_files:
         st.warning(f"⚠️ The following PDFs could not be read due to corruption or format issues: {', '.join(unreadable_files)}")
+        return None
 
     if empty_text_files:
         st.warning(f"⚠️ The following PDFs had no extractable text: {', '.join(empty_text_files)}")
+        return None
 
     return text
 
 
 def get_text_chunks(text):
+    if not text:
+        return []
+
     text_splitter = CharacterTextSplitter(
         separator="\n",
         chunk_size=1000,
@@ -55,6 +60,9 @@ def get_text_chunks(text):
 
 
 def get_vectorstore(text_chunks):
+    if not text_chunks:
+        return None
+
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
@@ -63,6 +71,10 @@ def get_vectorstore(text_chunks):
 
 
 def get_conversation_chain(vectorstore):
+    if not vectorstore:
+        st.error("❌ Cannot create conversation chain: vectorstore is missing or invalid.")
+        return None
+
     llm = ChatGroq(
         model_name="llama3-8b-8192"
     )
@@ -70,11 +82,13 @@ def get_conversation_chain(vectorstore):
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True
     )
+
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(),
         memory=memory
     )
+
     return conversation_chain
 
 
@@ -146,17 +160,36 @@ def main():
         pdf_docs = st.file_uploader(
             "Upload your PDFs here and click on 'Process'", accept_multiple_files=True
         )
+
         if st.button("Process"):
             if not pdf_docs:
                 st.error("❌ No PDF uploaded. Please upload at least one PDF before processing.")
-            else:
-                with st.spinner("Processing..."):
-                    raw_text = get_pdf_text(pdf_docs)
-                    text_chunks = get_text_chunks(raw_text)
-                    vectorstore = get_vectorstore(text_chunks)
-                    st.session_state.conversation = get_conversation_chain(vectorstore)
+                return
 
-                st.success("✅ PDF(s) processed successfully! You can now start chatting.")
+            with st.spinner("Processing..."):
+                raw_text = get_pdf_text(pdf_docs)
+                if not raw_text:
+                    st.error("❌ PDF processing stopped. No usable text found.")
+                    return
+
+                text_chunks = get_text_chunks(raw_text)
+                if not text_chunks:
+                    st.error("❌ No text chunks could be generated. Please try a different document.")
+                    return
+
+                vectorstore = get_vectorstore(text_chunks)
+                if not vectorstore:
+                    st.error("❌ Vectorstore creation failed.")
+                    return
+
+                conversation = get_conversation_chain(vectorstore)
+                if not conversation:
+                    st.error("❌ Failed to initialize conversation chain.")
+                    return
+
+                st.session_state.conversation = conversation
+
+            st.success("✅ PDF(s) processed successfully! You can now start chatting.")
 
 
 if __name__ == '__main__':
