@@ -8,6 +8,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
+from langchain_openai import ChatOpenAI
 from htmlTemplates import css, bot_template, user_template
 import os
 import time
@@ -43,7 +44,7 @@ def get_vectorstore(text_chunks):
 
 def get_conversation_chain(vectorstore):
     llm = ChatGroq(
-        model_name="llama-3.3-70b-versatile"
+        model_name="llama3-8b-8192"
     )
 
     memory = ConversationBufferMemory(
