@@ -14,11 +14,32 @@ import time
 
 def get_pdf_text(pdf_docs):
     text = ""
+    unreadable_files = []
+    empty_text_files = []
+
     for pdf in pdf_docs:
-        pdf_reader = PdfReader(pdf)
-        for page in pdf_reader.pages:
-            if page.extract_text():
-                text += page.extract_text()
+        try:
+            pdf_reader = PdfReader(pdf)
+            file_text = ""
+            for page in pdf_reader.pages:
+                extracted_text = page.extract_text()
+                if extracted_text:
+                    file_text += extracted_text
+
+            if file_text.strip():
+                text += file_text
+            else:
+                empty_text_files.append(pdf.name)
+
+        except Exception as e:
+            unreadable_files.append(pdf.name)
+
+    if unreadable_files:
+        st.warning(f"⚠️ The following PDFs could not be read due to corruption or format issues: {', '.join(unreadable_files)}")
+
+    if empty_text_files:
+        st.warning(f"⚠️ The following PDFs had no extractable text: {', '.join(empty_text_files)}")
+
     return text
 
 
