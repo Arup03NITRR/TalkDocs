@@ -8,7 +8,6 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
-from langchain_openai import ChatOpenAI
 from htmlTemplates import css, bot_template, user_template
 import os
 import time
