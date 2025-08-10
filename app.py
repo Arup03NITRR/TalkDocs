@@ -9,6 +9,7 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 from htmlTemplates import css, bot_template, user_template
+from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 import os
 import time
 
@@ -78,6 +79,19 @@ def get_conversation_chain(vectorstore):
     llm = ChatGroq(
         model_name="llama3-8b-8192"
     )
+
+    # Define system message
+    system_prompt = """You are a helpful AI assistant for 'TalkDocs'.
+    Always answer based only on the provided documents.
+    If the answer is not found in the documents, say "I couldn't find that in your files."
+    Provide clear, concise, and well-formatted responses.
+    Also you are able to compare document's contents and judge which one is better or best.
+    """
+
+    prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(system_prompt),
+        HumanMessagePromptTemplate.from_template("{question}")
+    ])
 
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True
